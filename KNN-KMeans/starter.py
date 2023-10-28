@@ -1,3 +1,5 @@
+from kmeans import KMeans
+
 # returns Euclidean distance between vectors a dn b
 #Input : vectors a & b
 #Ouput : scalar float value
@@ -5,7 +7,6 @@
 # construct test cases and compare against results packages like numpy or sklearn
 
 #Need to test!!!!!!!!!!!!!!!!!!!!!
-
 
 def euclidean(a,b):
   if len(a) != len(b):
@@ -45,14 +46,30 @@ def cosim(a,b):
 # metric is a string specifying either "euclidean" or "cosim".  
 # All hyper-parameters should be hard-coded in the algorithm.
 def knn(train,query,metric):
-    return(labels)
+    # return(labels)
+    return None
 
 # returns a list of labels for the query dataset based upon observations in the train dataset. 
 # labels should be ignored in the training set
 # metric is a string specifying either "euclidean" or "cosim".  
 # All hyper-parameters should be hard-coded in the algorithm.
 def kmeans(train,query,metric):
-    return(labels)
+  if metric != 'euclidean' and metric != 'cosim':
+    return (print("Please enter a valid metric"))
+
+  if metric == 'euclidean':
+    #euclidean knn
+    kmeans_euclidean = KMeans(n_clusters=3, metric="euclidean")
+    kmeans_euclidean.fit(train)
+    predicted_labels = kmeans.predict(query)
+    return (predicted_labels)
+
+  if metric == 'cosim':
+    kmeans_cosim = KMeans(n_clusters=3, metric="cosim")
+    #cosine knn
+    # return(labels)
+    return None
+
 
 def read_data(file_name):
     
@@ -86,7 +103,11 @@ def show(file_name,mode):
         print(' ')
             
 def main():
-    show('valid.csv','pixels')
+    # show('valid.csv','pixels')
+    train_data = read_data('/Users/jeongyoon/Downloads/HW2/KNN-KMeans/train.csv')
+    valid_data = read_data('/Users/jeongyoon/Downloads/HW2/KNN-KMeans/valid.csv')
+    test_data = read_data('/Users/jeongyoon/Downloads/HW2/KNN-KMeans/test.csv')
+    print(kmeans(train_data, test_data, 'euclidean'))
     
 if __name__ == "__main__":
     main()
