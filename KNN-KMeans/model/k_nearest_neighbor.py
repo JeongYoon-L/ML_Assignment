@@ -1,7 +1,7 @@
-import numpy as np 
-from .distances import euclidean_distances, manhattan_distances
+from utils.distance import euclidean, cosim
+from statistics import mode
 
-class KNearestNeighbor():    
+class KNearestNeighbor:
     def __init__(self, n_neighbors, distance_measure='euclidean', aggregator='mode'):
         """
         K-Nearest Neighbor is a straightforward algorithm that can be highly
@@ -14,19 +14,19 @@ class KNearestNeighbor():
 
         If 'euclidean', use euclidean_distances, if 'manhattan', use manhattan_distances.
 
-        ```aggregator``` lets you alter how a label is predicted for a data point based 
+        ```aggregator``` lets you alter how a label is predicted for a data point based
         on its neighbors. If it's set to `mean`, it is the mean of the labels of the
         neighbors. If it's set to `mode`, it is the mode of the labels of the neighbors.
         If it is set to median, it is the median of the labels of the neighbors. If the
         number of dimensions returned in the label is more than 1, the aggregator is
-        applied to each dimension independently. For example, if the labels of 3 
+        applied to each dimension independently. For example, if the labels of 3
         closest neighbors are:
             [
-                [1, 2, 3], 
-                [2, 3, 4], 
+                [1, 2, 3],
+                [2, 3, 4],
                 [3, 4, 5]
-            ] 
-        And the aggregator is 'mean', applied along each dimension, this will return for 
+            ]
+        And the aggregator is 'mean', applied along each dimension, this will return for
         that point:
             [
                 [2, 3, 4]
@@ -36,30 +36,33 @@ class KNearestNeighbor():
             n_neighbors {int} -- Number of neighbors to use for prediction.
             distance_measure {str} -- Which distance measure to use. Can be one of
                 'euclidean' or 'manhattan'. This is the distance measure
-                that will be used to compare features to produce labels. 
+                that will be used to compare features to produce labels.
             aggregator {str} -- How to aggregate a label across the `n_neighbors` nearest
                 neighbors. Can be one of 'mode', 'mean', or 'median'.
         """
         self.n_neighbors = n_neighbors
-
-        raise NotImplementedError()
-
+        self.distance_measure = distance_measure
+        self.aggregator = aggregator
+        self.features = []
+        self.targets = []
 
     def fit(self, features, targets):
         """Fit features, a numpy array of size (n_samples, n_features). For a KNN, this
-        function should store the features and corresponding targets in class 
+        function should store the features and corresponding targets in class
         variables that can be accessed in the `predict` function. Note that targets can
-        be multidimensional! 
-        
+        be multidimensional!
+
         Arguments:
             features {np.ndarray} -- Features of each data point, shape of (n_samples,
                 n_features).
-            targets {[type]} -- Target labels for each data point, shape of (n_samples, 
+            targets {[type]} -- Target labels for each data point, shape of (n_samples,
                 n_dimensions).
         """
+        if len(features) != len(targets):
+            return ValueError("")
 
-        raise NotImplementedError()
-        
+        self.features = features
+        self.targets = targets
 
     def predict(self, features, ignore_first=False):
         """Predict from features, a numpy array of size (n_samples, n_features) Use the
@@ -83,4 +86,28 @@ class KNearestNeighbor():
             labels {np.ndarray} -- Labels for each data point, of shape (n_samples,
                 n_dimensions). This n_dimensions should be the same as n_dimensions of targets in fit function.
         """
-        raise NotImplementedError()
+        distances = []
+        example = features
+        label = None
+
+        for i, f in enumerate(self.features):
+            if self.distance_measure == "euclidean":
+                d = euclidean(f, example)
+
+            elif self.distance_measure == "cosim":
+                d = cosim(f, example)
+
+            distances.append({
+                "class": self.targets[i],
+                "distance": d,
+                "vectors": [f, example]
+            })
+
+        distances = sorted(distances, key=lambda x: x["distance"])
+
+        top_n_neighbors = [d["class"] for d in distances[:self.n_neighbors]]
+
+        if self.aggregator == "mode":
+            label = mode(top_n_neighbors)
+
+        return label
