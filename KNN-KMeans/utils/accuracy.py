@@ -1,18 +1,21 @@
 from starter import read_data, knn
 
-def get_knn_accuracy():
-    train_data = read_data("../data/train.csv")
-    test_data = read_data("../data/test.csv")
+import pandas as pd
 
-    predicted_labels = knn(train_data, test_data, "euclidean")
+def get_knn_accuracy():
+    train_data_with_labels = pd.read_csv("../data/train.csv", header=None).values
+    test_data_with_labels = pd.read_csv("../data/test.csv", header=None).values
+    test_data_without_labels = test_data_with_labels[:, 1:785]
+
+    predicted_labels = knn(train_data_with_labels, test_data_without_labels, "euclidean")
 
     score = 0
 
     for i, l in enumerate(predicted_labels):
-        if l == test_data[i][0]:
+        if l == test_data_with_labels[i, 0]:
             score += 1
 
-    return score/len(test_data)
+    return score/test_data_with_labels.shape[0]
 
 
 if __name__ == "__main__":
