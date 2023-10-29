@@ -1,7 +1,6 @@
 import numpy as np
-# from starter import *
 
-class KMeans():
+class KMeans:
     def __init__(self, n_clusters, metric):
         """
         This class implements the traditional KMeans algorithm with hard assignments:
@@ -56,9 +55,7 @@ class KMeans():
                 if(np.array_equal(centers, new_centers)):
                     break
                 self.means = new_centers
-            
-                
-                
+
         elif self.metric == 'cosine':
             for _ in range(500): #set the random iter as 100
                 
