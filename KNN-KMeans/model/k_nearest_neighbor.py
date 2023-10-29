@@ -58,8 +58,8 @@ class KNearestNeighbor:
             targets {[type]} -- Target labels for each data point, shape of (n_samples,
                 n_dimensions).
         """
-        if len(features) != len(targets):
-            return ValueError("")
+        if not features.shape[0] == targets.shape[0]:
+            return ValueError("The dimension of two input vectors should be same")
 
         self.features = features
         self.targets = targets
@@ -90,12 +90,14 @@ class KNearestNeighbor:
         example = features
         label = None
 
-        for i, f in enumerate(self.features):
-            if self.distance_measure == "euclidean":
-                d = euclidean(f, example)
+        if self.distance_measure == "euclidean":
+            dist_func = euclidean
 
-            elif self.distance_measure == "cosim":
-                d = cosim(f, example)
+        elif self.distance_measure == "cosim":
+            dist_func = cosim
+
+        for i, f in enumerate(self.features):
+            d = dist_func(f, example)
 
             distances.append({
                 "class": self.targets[i],

@@ -1,33 +1,23 @@
+import numpy as np
+
 def euclidean(a, b):
-    if len(a) != len(b):
-        return ValueError("The dimension of two input vector should be same")
+    if not isinstance(a, np.ndarray) or not isinstance(b, np.ndarray):
+        return ValueError("The data type of two input vectors should be ndarray")
 
-    e_dist = 0
-    sum_of_dist = 0
+    if not a.shape == b.shape:
+        return ValueError("The dimension of two input vectors should be same")
 
-    for i in range(len(a)):
-        sum_of_dist += (a[i] - b[i]) ** 2
-
-    e_dist = sum_of_dist ** 0.5
-
-    return e_dist
-
+    return np.sqrt(np.sum((a - b) ** 2))
 
 def cosim(a, b):
-    if len(a) != len(b):
-        return ValueError("The dimension of two input vector should be same")
+    if not isinstance(a, np.ndarray) or not isinstance(b, np.ndarray):
+        return ValueError("The data type of two input vectors should be ndarray")
 
-    dotProduct = 0
+    if not a.shape == b.shape:
+        return ValueError("The dimension of two input vectors should be same")
 
-    for i in range(len(a)):
-        dotProduct += a[i] * b[i]
+    dot_prd = np.sum(a * b)
+    mod_a = np.sqrt(np.sum(a ** 2))
+    mod_b = np.sqrt(np.sum(b ** 2))
 
-    normA = (sum(x ** 2 for x in a)) ** 0.5
-    normB = (sum(x ** 2 for x in b)) ** 0.5
-
-    if normA == 0 or normB == 0:
-        return 0
-
-    c_dist = dotProduct / (normA * normB)
-
-    return c_dist
+    return dot_prd / (mod_a * mod_b)

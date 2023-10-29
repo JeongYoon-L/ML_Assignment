@@ -1,13 +1,15 @@
 from starter import knn, read_data
 
+import pandas as pd
+
 def test_knn():
-    train_data = read_data("../data/train.csv")
-    test_data = read_data("../data/test.csv")[:10]
+    train_data_with_labels = pd.read_csv("../data/train.csv", header=None).values
+    test_data_with_labels = pd.read_csv("../data/test.csv", header=None).values
+    test_data_without_labels = test_data_with_labels[:, 1:785]
 
-    predicted_labels = knn(train_data, test_data, "euclidean")
+    predicted_labels = knn(train_data_with_labels, test_data_without_labels, "euclidean")
 
-    assert len(predicted_labels) == len([d[0] for d in test_data])
-
+    assert len(predicted_labels) == test_data_with_labels.shape[0]
 
 def test_kmeans():
     pass
