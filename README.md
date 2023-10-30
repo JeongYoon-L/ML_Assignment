@@ -1,5 +1,5 @@
-- python3 -m venv venv
-- source venv/bin/activate
-- pip install -r requirements.txt
+- run `python3 -m venv venv`
+- run `source venv/bin/activate`
+- run `pip install -r requirements.txt`
 - run `pytest src/tests` to ensure the dev environment is setup correctly
 - run `python starter.py`
