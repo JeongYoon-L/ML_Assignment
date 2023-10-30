@@ -77,6 +77,7 @@ class KMeans:
 
             self.means = means
             print("iteration %s, means %s, clusters %s" % (i, self.means, clusters))
+            # print("iteration %s, means %s, clusters %s" % (i, len(self.means), 0))
 
     def predict(self, features):
         """

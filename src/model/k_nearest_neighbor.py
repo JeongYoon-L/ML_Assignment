@@ -1,4 +1,4 @@
-from utils.distance import euclidean, cosim
+from src.utils.distance import euclidean, cosim
 from statistics import mode
 
 class KNearestNeighbor:

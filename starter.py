@@ -1,12 +1,15 @@
-from .model.kmeans import KMeans
-from .model.k_nearest_neighbor import KNearestNeighbor
+from src.model.k_nearest_neighbor import KNearestNeighbor
+from src.model.kmeans import KMeans
+from src.utils.accuracy import get_accuracy
+
+import pandas as pd
 
 # returns a list of labels for the query dataset based upon labeled observations in the train dataset.
 # metric is a string specifying either "euclidean" or "cosim".  
 # All hyper-parameters should be hard-coded in the algorithm.
 def knn(train, query, metric):
-    labels = train[:, 0]
-    features = train[:, 1:785]
+    features = train[0]
+    labels = train[1]
 
     model = KNearestNeighbor(4, metric, "mode")
     model.fit(features, labels)
@@ -22,22 +25,13 @@ def knn(train, query, metric):
 # metric is a string specifying either "euclidean" or "cosim".  
 # All hyper-parameters should be hard-coded in the algorithm.
 def kmeans(train, query, metric):
-  if metric != 'euclidean' and metric != 'cosim':
-    return (print("Please enter a valid metric"))
+    features = train[0]
+    # labels = train[1]
 
-  if metric == 'euclidean':
-    #euclidean knn
-    kmeans_euclidean = KMeans(n_clusters=3, metric="euclidean")
-    kmeans_euclidean.fit(train)
-    predicted_labels = kmeans.predict(query)
-    return (predicted_labels)
+    model = KMeans(9, metric)
+    model.fit(features)
 
-  if metric == 'cosim':
-    kmeans_cosim = KMeans(n_clusters=3, metric="cosim")
-    #cosine knn
-    # return(labels)
-    return None
-
+    print(model.means)
 
 def read_data(file_name):
     
@@ -72,17 +66,21 @@ def show(file_name, mode):
         print(' ')
             
 def main():
-    # show('valid.csv','pixels')
-    # train_data = read_data('./train.csv')
-    # valid_data = read_data('./valid.csv')
-    # test_data = read_data('./test.csv')
-    # print(kmeans(train_data, test_data, 'euclidean'))
-    # train_data = pd.read_csv("./train.csv", header=None)
-    # train_data = train_data.iloc[:, :785]
-    # kmeans(train_data, test_data, 'euclidean')
-    pass
+    # knn
+    train_data = pd.read_csv('./src/data/train.csv').values
+    test_data = pd.read_csv('./src/data/test.csv').values
+    # valid_data = pd.read_csv('./src/data/valid.csv').values
 
-    
+    train = [train_data[:, 1:785], train_data[:, 0]]
+    query = test_data[:, 1:785]
+    predicted_labels = knn(train, query, "euclidean")
+
+    print("knn accuracy", get_accuracy(predicted_labels, test_data[:, 0].tolist()))
+
+    # kmeans
+    kmeans(train, query, "euclidean")
+
+
 if __name__ == "__main__":
     main()
     
