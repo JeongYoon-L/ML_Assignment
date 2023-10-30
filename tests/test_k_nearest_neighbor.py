@@ -1,4 +1,4 @@
-from model.k_nearest_neighbor import KNearestNeighbor
+from ..model.k_nearest_neighbor import KNearestNeighbor
 
 import numpy as np
 
