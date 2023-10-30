@@ -1,4 +1,5 @@
 - python3 -m venv venv
 - source venv/bin/activate
 - pip install -r requirements.txt
-- python accuracy.py
+- run `pytest src/tests` to ensure the dev environment is setup correctly
+- run `python starter.py`
