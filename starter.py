@@ -1,5 +1,5 @@
-from model.kmeans import KMeans
-from model.k_nearest_neighbor import KNearestNeighbor
+from .model.kmeans import KMeans
+from .model.k_nearest_neighbor import KNearestNeighbor
 
 # returns a list of labels for the query dataset based upon labeled observations in the train dataset.
 # metric is a string specifying either "euclidean" or "cosim".  

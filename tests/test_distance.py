@@ -1,4 +1,4 @@
-from utils.distance import euclidean, cosim
+from ..utils.distance import euclidean, cosim
 
 import numpy as np
 

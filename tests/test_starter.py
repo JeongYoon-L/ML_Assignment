@@ -1,4 +1,4 @@
-from starter import knn, read_data
+from ..starter import knn
 
 import pandas as pd
 
