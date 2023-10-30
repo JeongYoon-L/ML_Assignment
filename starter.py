@@ -2,6 +2,8 @@ from src.model.k_nearest_neighbor import KNearestNeighbor
 from src.model.kmeans import KMeans
 from src.utils.accuracy import get_accuracy
 
+import pandas as pd
+
 # returns a list of labels for the query dataset based upon labeled observations in the train dataset.
 # metric is a string specifying either "euclidean" or "cosim".  
 # All hyper-parameters should be hard-coded in the algorithm.
@@ -24,10 +26,10 @@ def knn(train, query, metric):
 # All hyper-parameters should be hard-coded in the algorithm.
 def kmeans(train, query, metric):
     features = train[0]
-    labels = train[1]
+    # labels = train[1]
 
-    model = KMeans(4, metric)
-    model.fit(features, labels)
+    model = KMeans(9, metric)
+    model.fit(features)
 
     print(model.means)
 
@@ -65,16 +67,15 @@ def show(file_name, mode):
             
 def main():
     # knn
-    train_data = read_data('.src/data/train.csv').values
-    valid_data = read_data('.src/data/valid.csv').values
-    test_data = read_data('.src/data/test.csv').values
+    train_data = pd.read_csv('./src/data/train.csv').values
+    test_data = pd.read_csv('./src/data/test.csv').values
+    # valid_data = pd.read_csv('./src/data/valid.csv').values
 
     train = [train_data[:, 1:785], train_data[:, 0]]
-    query = valid_data[:, 1:785]
-
+    query = test_data[:, 1:785]
     predicted_labels = knn(train, query, "euclidean")
 
-    print("knn accuracy", get_accuracy(predicted_labels, valid_data[:, 0].tolist()))
+    print("knn accuracy", get_accuracy(predicted_labels, test_data[:, 0].tolist()))
 
     # kmeans
     kmeans(train, query, "euclidean")
