@@ -71,13 +71,23 @@ class KMeans:
 
                 clusters[selected_mean_hash].append(f)
 
-            means = []
-            for _, c in clusters.items():
-                means.append(np.average(c, axis=0))
+            means = [np.mean(cluster, axis=0) for cluster in clusters.values()]
+
+            if np.array_equal(self.means, means):
+                # print("iteration %s, means %s, clusters %s" % (i, self.means, clusters))
+                # print(i)
+
+                # fig, axes = plt.subplots(2, 5, figsize=(8, 3))
+                # for i, ax in enumerate(axes.flat):
+                #     if i < len(means):
+                #         ax.imshow(means[i].reshape(28, 28), cmap='gray')
+                #         ax.set_title(f'Cluster {i}')
+                #     ax.axis('off')
+
+                # plt.show()
+                break
 
             self.means = means
-            print("iteration %s, means %s, clusters %s" % (i, self.means, clusters))
-            # print("iteration %s, means %s, clusters %s" % (i, len(self.means), 0))
 
     def predict(self, features):
         """
