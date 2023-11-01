@@ -2,8 +2,10 @@ from ..utils.distance import euclidean, cosim
 
 import numpy as np
 import math
+from statistics import mode
 
-MAX_ITERATIONS = 1000
+MAX_ITERATIONS = 100
+N_NEIGHBORS = 10
 
 class KMeans:
     def __init__(self, n_clusters, distance_measure='euclidean'):
@@ -30,9 +32,11 @@ class KMeans:
         self.n_clusters = n_clusters
         self.distance_measure = distance_measure
         self.features = []
+        self.labels = []
         self.means = []
+        self.clusters = []
 
-    def fit(self, features):
+    def fit(self, features, labels):
         """
         Fit KMeans to the given data using `self.n_clusters` number of clusters.
         Features can have greater than 2 dimensions.
@@ -44,6 +48,7 @@ class KMeans:
             None (saves model - means - internally)
         """
         self.features = features
+        self.labels = labels
         self.means = features[np.random.choice(len(features), size=self.n_clusters, replace=False)]
 
         if self.distance_measure == "euclidean":
@@ -71,23 +76,35 @@ class KMeans:
 
                 clusters[selected_mean_hash].append(f)
 
-            means = [np.mean(cluster, axis=0) for cluster in clusters.values()]
+            self.means = []
+            self.clusters = []
+            for _, cluster in clusters.items():
+                mean = np.mean(cluster, axis=0)
+                self.means.append(mean)
+                self.clusters.append({
+                    "features": cluster,
+                    "label": "",
+                    "mean": mean
+                })
 
-            if np.array_equal(self.means, means):
-                # print("iteration %s, means %s, clusters %s" % (i, self.means, clusters))
-                # print(i)
+        features_labels_map = {}
+        for i, f in enumerate(self.features):
+            feature_hash = hash(f.tobytes())
+            features_labels_map[feature_hash] = self.labels[i]
 
-                # fig, axes = plt.subplots(2, 5, figsize=(8, 3))
-                # for i, ax in enumerate(axes.flat):
-                #     if i < len(means):
-                #         ax.imshow(means[i].reshape(28, 28), cmap='gray')
-                #         ax.set_title(f'Cluster {i}')
-                #     ax.axis('off')
+        for i, c in enumerate(self.clusters):
+            distances = []
+            for f in c["features"]:
+                distances.append({
+                    "label": features_labels_map[hash(f.tobytes())],
+                    "distance": distance_func(f, c["mean"])
+                })
 
-                # plt.show()
-                break
+            distances = sorted(distances, key=lambda x: x["distance"])
 
-            self.means = means
+            top_n_neighbors = [d["label"] for d in distances[:N_NEIGHBORS]]
+
+            self.clusters[i]["label"] = mode(top_n_neighbors)
 
     def predict(self, features):
         """

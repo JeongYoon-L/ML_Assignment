@@ -98,7 +98,6 @@ class KNearestNeighbor:
 
         for i, f in enumerate(self.features):
             d = dist_func(f, example)
-
             distances.append({
                 "class": self.targets[i],
                 "distance": d,
