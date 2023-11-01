@@ -33,14 +33,19 @@ def kmeans(train, query, metric):
     features = train[0]
     labels = train[1]
 
+    query_features = query[0]
+
     model = KMeans(10, metric)
     model.fit(features, labels)
 
-    for i, c in enumerate(model.clusters):
-        print(i, c["label"])
+    # means = [c["mean"] for c in model.clusters]
+    # plot_k_means_centroids(means)
 
-    means = [c["mean"] for c in model.clusters]
-    plot_k_means_centroids(means)
+    predicted_labels = []
+    for q in query_features:
+        predicted_labels.append(model.predict(q))
+    len(predicted_labels)
+    return predicted_labels
 
 
 def read_data(file_name):
@@ -166,7 +171,11 @@ def main():
     # print("knn validation accuracy for K = %d : %f" % (best_k_value, best_k_value_accuracy))
 
     # kmeans
-    kmeans(train, validation, "euclidean")
+    predicted_labels = kmeans(train, validation, "euclidean")
+    print("kmeans validation accuracy : %f" % (get_accuracy(predicted_labels, validation[1].tolist())))
+
+    predicted_labels = kmeans(train, test, "euclidean")
+    print("kmeans test accuracy : %f" % (get_accuracy(predicted_labels, test[1].tolist())))
 
 
 if __name__ == "__main__":

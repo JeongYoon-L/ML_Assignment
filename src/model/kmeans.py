@@ -4,7 +4,7 @@ import numpy as np
 import math
 from statistics import mode
 
-MAX_ITERATIONS = 100
+MAX_ITERATIONS = 1000
 N_NEIGHBORS = 10
 
 class KMeans:
@@ -119,4 +119,19 @@ class KMeans:
                 of size (n_samples,). Each element of the array is the index of the
                 cluster the sample belongs to.
         """
-        raise NotImplementedError()
+
+        shortest_distance = math.inf
+        closest_cluster = None
+
+        if self.distance_measure == "euclidean":
+            distance_func = euclidean
+        else:
+            distance_func = cosim
+
+        for _, c in enumerate(self.clusters):
+            d = distance_func(features, c["mean"])
+            if d < shortest_distance:
+                shortest_distance = d
+                closest_cluster = c
+
+        return closest_cluster["label"] if closest_cluster else ""
