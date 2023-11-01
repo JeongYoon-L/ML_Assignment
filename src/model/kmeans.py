@@ -76,16 +76,21 @@ class KMeans:
 
                 clusters[selected_mean_hash].append(f)
 
-            self.means = []
+            new_means = []
             self.clusters = []
             for _, cluster in clusters.items():
                 mean = np.mean(cluster, axis=0)
-                self.means.append(mean)
+                new_means.append(mean)
                 self.clusters.append({
                     "features": cluster,
                     "label": "",
                     "mean": mean
                 })
+
+            if np.equal(new_means, self.means).all():
+                break
+            else:
+                self.means = new_means
 
         features_labels_map = {}
         for i, f in enumerate(self.features):
