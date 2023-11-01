@@ -10,9 +10,10 @@ def test_fit():
         [4, 4, 4, 4, 4, 4],
         [5, 5, 5, 5, 5, 5],
     ])
+    labels = np.array([1, 2, 3, 4, 5])
 
     model = KMeans(2)
-    model.fit(features)
+    model.fit(features, labels)
 
     assert len(model.means) == 2
     assert len(model.means[0]) == 6
