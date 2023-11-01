@@ -24,18 +24,24 @@ def knn(train, query, metric, aggregator, k_value):
 
     return predicted_labels
 
+
 # returns a list of labels for the query dataset based upon observations in the train dataset. 
 # labels should be ignored in the training set
 # metric is a string specifying either "euclidean" or "cosim".  
 # All hyper-parameters should be hard-coded in the algorithm.
 def kmeans(train, query, metric):
     features = train[0]
-    # labels = train[1]
+    labels = train[1]
 
-    model = KMeans(9, metric)
-    model.fit(features)
+    model = KMeans(10, metric)
+    model.fit(features, labels)
 
-    # print(model.means)
+    for i, c in enumerate(model.clusters):
+        print(i, c["label"])
+
+    means = [c["mean"] for c in model.clusters]
+    plot_k_means_centroids(means)
+
 
 def read_data(file_name):
     
@@ -51,7 +57,8 @@ def read_data(file_name):
             data_set.append([label, attribs])
 
     return data_set
-        
+
+
 def show(file_name, mode):
     
     data_set = read_data(file_name)
@@ -82,9 +89,11 @@ def get_best_k_value_for_knn(train, validation, metric, aggregator):
     best_acc = 0
     n_components = 60
 
-    pca = PCA(n_components)
-    reduced_train_features = pca.fit_transform(train_features)
-    reduced_validation_features = pca.transform(validation_features)
+    reduced_train_features, reduced_validation_features = get_reduced_features(
+        train_features,
+        validation_features,
+        n_components
+    )
 
     for k in range(1, K):
         model = KNearestNeighbor(k, metric, aggregator)
@@ -104,24 +113,60 @@ def get_best_k_value_for_knn(train, validation, metric, aggregator):
     return best_k
 
 
+def plot_k_means_centroids(means):
+    fig, axes = plt.subplots(2, 5, figsize=(8, 3))
+
+    for i, ax in enumerate(axes.flat):
+        if i < len(means):
+            ax.imshow(means[i].reshape(28, 28), cmap="gray")
+            ax.set_title(f"Cluster {i}")
+        ax.axis("off")
+
+    plt.show()
+
+def get_reduced_features(train_features, test_features, n_components):
+    pca = PCA(n_components)
+    reduced_train_features = pca.fit_transform(train_features)
+    reduced_test_features = pca.transform(test_features)
+    return reduced_train_features, reduced_test_features
+
 def main():
     # knn
-    train_data = pd.read_csv('./src/data/train.csv').values
-    test_data = pd.read_csv('./src/data/test.csv').values
-    validation_data = pd.read_csv('./src/data/valid.csv').values
+    train_data = pd.read_csv("./src/data/train.csv", header=None).values
+    test_data = pd.read_csv("./src/data/test.csv", header=None).values
+    validation_data = pd.read_csv("./src/data/valid.csv", header=None).values
 
     train = [train_data[:, 1:785], train_data[:, 0]]
     test = [test_data[:, 1:785], test_data[:, 0]]
     validation = [validation_data[:, 1:785], validation_data[:, 0]]
 
-    best_k_value = get_best_k_value_for_knn(train, validation, "euclidean", "mode")
-    best_k_value_predicted_labels = knn(train, test, "euclidean", "mode", best_k_value)
-    best_k_value_accuracy = get_accuracy(best_k_value_predicted_labels, test[1].tolist())
-
-    print("knn validation accuracy for K = %d : %f" % (best_k_value, best_k_value_accuracy))
+    # best_k_value = get_best_k_value_for_knn(
+    #     train,
+    #     validation,
+    #     "euclidean",
+    #     "mode"
+    # )
+    # reduced_train_features, reduced_test_features = get_reduced_features(
+    #     train[0],
+    #     test[0],
+    #     60
+    # )
+    # best_k_value_predicted_labels = knn(
+    #     [reduced_train_features, train[1]],
+    #     [reduced_test_features],
+    #     "euclidean",
+    #     "mode",
+    #     best_k_value,
+    # )
+    # best_k_value_accuracy = get_accuracy(
+    #     best_k_value_predicted_labels,
+    #     test[1].tolist()
+    # )
+    #
+    # print("knn validation accuracy for K = %d : %f" % (best_k_value, best_k_value_accuracy))
 
     # kmeans
-    # kmeans(train, query, "euclidean")
+    kmeans(train, validation, "euclidean")
 
 
 if __name__ == "__main__":
