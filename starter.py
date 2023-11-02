@@ -1,5 +1,6 @@
 from src.model.k_nearest_neighbor import KNearestNeighbor
 from src.model.kmeans import KMeans
+from src.model.soft_kmeans import SoftKMeans
 from src.utils.accuracy import get_accuracy
 
 import pandas as pd
@@ -46,6 +47,26 @@ def kmeans(train, query, metric):
         predicted_labels.append(model.predict(q))
     len(predicted_labels)
     return predicted_labels
+
+
+def soft_kmeans(train, query, beta):
+    features = train[0]
+    labels = train[1]
+
+    query_features = query[0]
+
+    print(features.shape)
+    model = SoftKMeans(10, beta)
+    model.fit(features, labels)
+
+    # means = [c["mean"] for c in model.clusters]
+    # plot_k_means_centroids(means)
+
+    predicted_probs = []
+    for q in query_features:
+        predicted_probs.append(model.predict(q))
+    len(predicted_probs)
+    return predicted_probs
 
 
 def read_data(file_name):
@@ -145,30 +166,30 @@ def main():
     test = [test_data[:, 1:785], test_data[:, 0]]
     validation = [validation_data[:, 1:785], validation_data[:, 0]]
 
-    # best_k_value = get_best_k_value_for_knn(
-    #     train,
-    #     validation,
-    #     "euclidean",
-    #     "mode"
-    # )
-    # reduced_train_features, reduced_test_features = get_reduced_features(
-    #     train[0],
-    #     test[0],
-    #     60
-    # )
-    # best_k_value_predicted_labels = knn(
-    #     [reduced_train_features, train[1]],
-    #     [reduced_test_features],
-    #     "euclidean",
-    #     "mode",
-    #     best_k_value,
-    # )
-    # best_k_value_accuracy = get_accuracy(
-    #     best_k_value_predicted_labels,
-    #     test[1].tolist()
-    # )
-    #
-    # print("knn validation accuracy for K = %d : %f" % (best_k_value, best_k_value_accuracy))
+    best_k_value = get_best_k_value_for_knn(
+        train,
+        validation,
+        "euclidean",
+        "mode"
+    )
+    reduced_train_features, reduced_test_features = get_reduced_features(
+        train[0],
+        test[0],
+        60
+    )
+    best_k_value_predicted_labels = knn(
+        [reduced_train_features, train[1]],
+        [reduced_test_features],
+        "euclidean",
+        "mode",
+        best_k_value,
+    )
+    best_k_value_accuracy = get_accuracy(
+        best_k_value_predicted_labels,
+        test[1].tolist()
+    )
+
+    print("knn validation accuracy for K = %d : %f" % (best_k_value, best_k_value_accuracy))
 
     # kmeans
     predicted_labels = kmeans(train, validation, "euclidean")
@@ -176,6 +197,9 @@ def main():
 
     predicted_labels = kmeans(train, test, "euclidean")
     print("kmeans test accuracy : %f" % (get_accuracy(predicted_labels, test[1].tolist())))
+
+    # soft kmeans
+    # soft_kmeans(train, validation, 0.5)
 
 
 if __name__ == "__main__":
