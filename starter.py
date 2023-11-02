@@ -188,7 +188,6 @@ def main():
         best_k_value_predicted_labels,
         test[1].tolist()
     )
-
     print("knn validation accuracy for K = %d : %f" % (best_k_value, best_k_value_accuracy))
 
     # kmeans
