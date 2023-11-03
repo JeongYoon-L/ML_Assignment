@@ -6,6 +6,8 @@ from src.utils.accuracy import get_accuracy
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+import seaborn as sns
+import numpy as np
 
 # returns a list of labels for the query dataset based upon labeled observations in the train dataset.
 # metric is a string specifying either "euclidean" or "cosim".  
@@ -130,9 +132,9 @@ def get_best_k_value_for_knn(train, validation, metric, aggregator):
             predicted_labels.append(model.predict(v))
 
         acc = get_accuracy(predicted_labels, validation_labels.tolist())
-        print("knn test accuracy for K = %d , PCA = %d : %f" % (k, n_components, acc))
+        print("Knn validation accuracy for K = %d , PCA component = %d : %f" % (k, n_components, acc))
 
-        if acc > best_acc:
+        if acc >= best_acc:
             best_acc = acc
             best_k = k
 
@@ -149,6 +151,26 @@ def plot_k_means_centroids(means):
         ax.axis("off")
 
     plt.show()
+
+def create_confusion_matrix(true_labels, predicted_labels):
+    confusion_matrix = np.zeros((10, 10), dtype=int)
+
+    for true_label, predicted_label in zip(true_labels, predicted_labels):
+        confusion_matrix[int(true_label)][int(predicted_label)] += 1
+
+    return confusion_matrix
+
+
+def plot_confusion_matrix(confusion_matrix, class_names, title):
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax = sns.heatmap(confusion_matrix, annot=True, fmt='d', cmap="Blues", linewidths=0.5, linecolor="black")
+    ax.set_xticklabels(class_names)
+    ax.set_yticklabels(class_names)
+    ax.set_xlabel("Predicted Labels")
+    ax.set_ylabel("True Labels")
+    ax.set_title(title)
+    plt.show()
+
 
 def get_reduced_features(train_features, test_features, n_components):
     pca = PCA(n_components)
@@ -188,14 +210,25 @@ def main():
         best_k_value_predicted_labels,
         test[1].tolist()
     )
-    print("knn validation accuracy for K = %d : %f" % (best_k_value, best_k_value_accuracy))
+    print("Knn test accuracy for K = %d : %f" % (best_k_value, best_k_value_accuracy))
+
+    #confusion matrix
+    class_names = [str(i) for i in range(10)]
+    confusion_matrix_knn = create_confusion_matrix(test[1].tolist(), best_k_value_predicted_labels)
+    plot_confusion_matrix(confusion_matrix_knn, class_names, "K-Nearest Neighbors Confusion Matrix")
+
 
     # kmeans
     predicted_labels = kmeans(train, validation, "euclidean")
-    print("kmeans validation accuracy : %f" % (get_accuracy(predicted_labels, validation[1].tolist())))
+    print("K-Means validation accuracy : %f" % (get_accuracy(predicted_labels, validation[1].tolist())))
 
     predicted_labels = kmeans(train, test, "euclidean")
-    print("kmeans test accuracy : %f" % (get_accuracy(predicted_labels, test[1].tolist())))
+    print("K-Means test accuracy : %f" % (get_accuracy(predicted_labels, test[1].tolist())))
+
+    #confusion matrix
+    confusion_matrix_kmeans = create_confusion_matrix(test[1].tolist(), predicted_labels)
+    plot_confusion_matrix(confusion_matrix_kmeans, class_names, "K-Means Confusion Matrix")
+
 
     # soft kmeans
     # soft_kmeans(train, validation, 0.5)
