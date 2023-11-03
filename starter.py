@@ -43,7 +43,7 @@ def kmeans(train, query, metric):
     reduced_train_features, reduced_test_features = get_reduced_features(
         features,
         query_features,
-        60
+        50
     )
     model.fit(reduced_train_features, labels)
 
