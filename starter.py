@@ -39,13 +39,19 @@ def kmeans(train, query, metric):
     query_features = query[0]
 
     model = KMeans(10, metric)
-    model.fit(features, labels)
+
+    reduced_train_features, reduced_test_features = get_reduced_features(
+        features,
+        query_features,
+        60
+    )
+    model.fit(reduced_train_features, labels)
 
     # means = [c["mean"] for c in model.clusters]
     # plot_k_means_centroids(means)
 
     predicted_labels = []
-    for q in query_features:
+    for q in reduced_test_features:
         predicted_labels.append(model.predict(q))
     len(predicted_labels)
     return predicted_labels
