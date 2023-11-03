@@ -184,6 +184,21 @@ def get_reduced_features(train_features, test_features, n_components):
     reduced_test_features = pca.transform(test_features)
     return reduced_train_features, reduced_test_features
 
+def skm(train, query, metric, aggregator, k_value):
+    features = train[0]
+    labels = train[1]
+
+    query_features = query[0]
+
+    model = SoftKMeans(k_value, metric, aggregator)
+    model.fit(features, labels)
+
+    predicted_labels = []
+    for q in query_features:
+        predicted_labels.append(model.predict(q))
+
+    return predicted_labels
+
 def main():
     # knn
     train_data = pd.read_csv("./src/data/train.csv", header=None).values
@@ -237,7 +252,8 @@ def main():
 
 
     # soft kmeans
-    # soft_kmeans(train, validation, 0.5)
+    # predicted_labels = skm(train, test, "cosim", "mode", 9)
+    # print(predicted_labels)
 
 
 if __name__ == "__main__":
