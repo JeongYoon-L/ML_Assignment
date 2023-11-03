@@ -43,7 +43,7 @@ def kmeans(train, query, metric):
     reduced_train_features, reduced_test_features = get_reduced_features(
         features,
         query_features,
-        60
+        50
     )
     model.fit(reduced_train_features, labels)
 
@@ -121,7 +121,7 @@ def get_best_k_value_for_knn(train, validation, metric, aggregator):
     K = 10
     best_k = 0
     best_acc = 0
-    n_components = 60
+    n_components = 50
 
     reduced_train_features, reduced_validation_features = get_reduced_features(
         train_features,
@@ -203,7 +203,7 @@ def main():
     reduced_train_features, reduced_test_features = get_reduced_features(
         train[0],
         test[0],
-        60
+        50
     )
     best_k_value_predicted_labels = knn(
         [reduced_train_features, train[1]],
